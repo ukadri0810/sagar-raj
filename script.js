@@ -1,1 +1,38 @@
-const toggle=document.querySelector('.menu-toggle');const menu=document.querySelector('#menu');toggle.addEventListener('click',()=>{const open=menu.classList.toggle('open');toggle.setAttribute('aria-expanded',String(open));toggle.textContent=open?'✕':'☰'});menu.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{menu.classList.remove('open');toggle.setAttribute('aria-expanded','false');toggle.textContent='☰'}));document.querySelector('#year').textContent=new Date().getFullYear();const today=new Date();const localToday=new Date(today.getTime()-today.getTimezoneOffset()*60000).toISOString().slice(0,10);const ci=document.querySelector('#checkin'),co=document.querySelector('#checkout');ci.min=localToday;co.min=localToday;ci.addEventListener('change',()=>{co.min=ci.value;if(co.value&&co.value<=ci.value)co.value=''});document.querySelector('#booking-form').addEventListener('submit',e=>{e.preventDefault();if(co.value<=ci.value){alert('Please select a check-out date after check-in.');return}const message=`Hello Sagar Raj Beach Resort, I would like to enquire about a stay.\nCheck-in: ${ci.value}\nCheck-out: ${co.value}\nGuests: ${document.querySelector('#guests').value}\nPlease share room availability and rates.`;window.open('https://wa.me/917588144741?text='+encodeURIComponent(message),'_blank','noopener,noreferrer')});
+// Replace with the resort's verified WhatsApp-enabled reservation number, digits only.
+const WHATSAPP_NUMBER = '917588144741';
+const menuButton = document.getElementById('menuButton');
+const mobileNav = document.getElementById('mobileNav');
+menuButton.addEventListener('click', () => {
+  const isOpen = menuButton.getAttribute('aria-expanded') === 'true';
+  menuButton.setAttribute('aria-expanded', String(!isOpen));
+  mobileNav.hidden = isOpen;
+});
+mobileNav.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
+  mobileNav.hidden = true;
+  menuButton.setAttribute('aria-expanded', 'false');
+}));
+const checkin = document.getElementById('checkin');
+const checkout = document.getElementById('checkout');
+const feedback = document.getElementById('formFeedback');
+const today = new Date();
+const todayLocal = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+checkin.min = todayLocal;
+checkout.min = todayLocal;
+checkin.addEventListener('change', () => {
+  checkout.min = checkin.value || todayLocal;
+  if (checkout.value && checkout.value <= checkin.value) checkout.value = '';
+});
+document.getElementById('bookingForm').addEventListener('submit', (event) => {
+  event.preventDefault();
+  if (!checkin.value || !checkout.value || checkout.value <= checkin.value) {
+    feedback.textContent = 'Please choose a valid check-in and check-out date.';
+    return;
+  }
+  const guests = document.getElementById('guests').selectedOptions[0].textContent;
+  const message = `Hello Sagar Raj Beach Resort! I'd like to enquire about a stay.\nCheck-in: ${checkin.value}\nCheck-out: ${checkout.value}\nGuests: ${guests}\nPlease share available rooms and rates. Thank you!`;
+  const url = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(message)}`;
+  feedback.textContent = 'Opening WhatsApp with your enquiry…';
+  // Same-tab navigation avoids popup blockers on mobile and GitHub Pages.
+  window.location.assign(url);
+});
+document.getElementById('year').textContent = new Date().getFullYear();
