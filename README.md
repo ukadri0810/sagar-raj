@@ -14,3 +14,5 @@ Confirm that +91 95275 20146 is still the active WhatsApp booking number, and th
 
 ## Local preview
 Open `index.html` in a browser. All local images are under `assets/`.
+
+Version 7: removed internal verification notes from the visible website footer, improved phone layout and linked footer enquiry directly to WhatsApp.
